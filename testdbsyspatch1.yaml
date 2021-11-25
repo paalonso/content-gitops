@@ -1,0 +1,52 @@
+- hosts: "{{ node }}"
+  vars_files:
+   - vars.yaml
+
+  tasks:
+  - name: Step 1/6 List databases
+    become: yes
+    become_method: sudo
+    become_user: root
+    shell: /opt/oracle/dcs/bin/dbcli list-databases
+    register: dblist
+  - debug: var=dblist.stdout_lines
+
+  - name: Step 2/6 Patch precheck
+    become: yes
+    become_method: sudo
+    become_user: root
+    script: prechkDBCSdbHomeInplace.sh "{{ dbHomeId }}" "{{ dbSwImage }}"
+    register: precheck
+  - debug: var=precheck.stdout_lines
+
+  - name: Step 3/6 Stop databases
+    become: yes
+    become_method: sudo
+    become_user: root
+    script: stopDBCSDBs.sh "{{ dbHomeId }}"
+    register: stopDBs
+  - debug: var=stopDBs.stdout_lines 
+
+  - name: Step 4/6 Apply patch DB home
+    become: yes
+    become_method: sudo
+    become_user: root
+    script: patchDBCSdbHomeInplace.sh "{{ dbHomeId }}" "{{ dbSwImage }}"
+    register: patch
+  - debug: var=patch.stdout_lines
+
+  - name: Step 5/6 Start databases
+    become: yes
+    become_method: sudo
+    become_user: root
+    script: startDBCSDBs.sh "{{ dbHomeId }}"
+    register: startDBs
+  - debug: var=startDBs.stdout_lines
+
+  - name: Step 6/6 Final database status
+    become: yes
+    become_method: sudo
+    become_user: root
+    shell: /opt/oracle/dcs/bin/dbcli list-databases
+    register: dblist
+  - debug: var=dblist.stdout_lines
