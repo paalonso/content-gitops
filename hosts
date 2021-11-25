@@ -1,0 +1,10 @@
+[master]
+10.0.10.117 ansible_python_interpreter=auto_silent
+
+[workers]
+10.0.10.142 ansible_python_interpreter=auto_silent
+10.0.10.131 ansible_python_interpreter=auto_silent
+
+[dbbare1]
+10.0.10.49 ansible_python_interpreter=auto_silent 
+
